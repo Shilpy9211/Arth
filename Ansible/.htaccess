@@ -1,0 +1,4 @@
+AuthName "Shilpy.mysite"
+AuthType Basic
+AuthUserFile /etc/www.passwd
+Require valid-user

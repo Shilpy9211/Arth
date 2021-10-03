@@ -1,0 +1,41 @@
+---
+
+- hosts: all
+  tasks:
+          - name: install or verify htpd software
+            package:
+                    name: httpd
+                    state: present
+          - name: copy webpage to /var/www/html folder
+            copy:
+                    dest: /var/www/html/index.html
+                    content: "<center>Hey there Shilpy!</center></Br></Br></Br>Welcome to our safe site."
+          - name: rplace AllowNone with AllowAuth
+            replace:
+                    path: /etc/httpd/conf/httpd.conf
+                    regexp: AllowOverride None
+                    replace: AllowOverride AuthConfig
+
+          - name: install passlib for using htpasswd module
+            package:
+                    name: python3
+                    state: present
+          - pip:
+                  name: passlib
+
+          - name: Create database to store user detail
+            htpasswd:
+                    path: /etc/www.passwd
+                    name: shilpy
+                    password: gautam
+
+          - name: Copy .htaccess file in docuument root
+            copy:
+                    src: .htaccess
+                    dest: "/var/www/html/.htaccess"
+          - name: start httpd services
+            service:
+                    name: httpd
+                    state: restarted
+
+
