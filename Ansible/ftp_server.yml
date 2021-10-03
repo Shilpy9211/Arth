@@ -1,0 +1,52 @@
+- hosts: all
+  tasks:
+          - name: create directory
+            file:
+                    path: /dvd
+                    state: directory
+          - name: mount to cdrom
+            mount:
+                    src: /dev/sr0
+                    path: /dvd
+                    fstype: iso9660
+                    state: mounted
+          - name: create repository
+            copy:
+                    src: /etc/yum.repos.d/local.repo
+                    dest: /rtc/yum.repos.d/
+          - name: software for configuring ftp server
+            package:
+                    name: vsftpd
+                    state: present
+          - name: allow anonymous login 
+            replace:
+                    path: /etc/vsftpd/vsftpd.conf
+                    regexp: anonymous_enable=NO
+                    replace: anonymous_enable=YES
+          - name: start vsftpd services
+            service:
+                    enabled: yes
+                    name: vsftpd
+                    state: started
+          - name: firewall setup
+            firewalld:
+                      service: ftp
+                      permanent: yes
+                      immediate: yes
+                      state: enabled             
+
+
+
+                    
+
+
+
+
+
+
+
+
+
+
+
+           

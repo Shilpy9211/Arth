@@ -1,0 +1,63 @@
+---
+
+- hosts: all
+  vars_prompt:
+          - name: document_root
+            private: no
+            prompt: "please enter your new document root"
+
+          - name: new_port
+            private: no
+            prompt: "please enter your new port number"
+
+  vars:          
+          - new_webpage: "index.html"
+            conf_file: "abc.conf"
+            content: "<h1><centre>Welcome To Our Services</h1></Br>
+            <h2><centre>Don't forget to give your feedback</h2>"
+
+  tasks:
+          - name: gather facts of ip address of anaged node
+            setup:
+                    filter: ansible_facts['default_ipv4']['address']
+
+          - name: install or verify whether httpd software is there or not
+            package:
+                    name: httpd
+                    state: present
+
+          - name: create new folder for document root
+            file:
+                    path: "{{ document_root }}"
+                    state: directory
+
+          - name: copy webpage from controller to managed
+            copy:
+                    dest: "{{ document_root }}/{{ new_webpage }}"
+                    content: "{{ content }}"
+
+          - name: Copy httpd config file
+            template:
+                    src: "/root/playbooks/webpages/{{ conf_file }}"
+                    dest: /etc/httpd/conf.d/
+            notify:
+                    restart httpd
+      
+          - name: start or ensure httpd service is running
+            service:
+                    name: httpd
+                    state: started
+
+          - firewalld:
+                  port: "{{ new_port }}/tcp"
+                  permanent: yes
+                  immediate: yes
+                  state: enabled
+
+  handlers:
+       - name: restart httpd
+         service:
+                   name: httpd
+                   state: restarted
+
+

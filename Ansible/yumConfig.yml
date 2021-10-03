@@ -1,0 +1,16 @@
+---
+- hosts: 127.0.0.1
+  tasks:
+          - name: repository for AppStream
+            yum_repository:
+                    name: AppStream
+                    description: AppStream Local Repo
+                    baseurl: file:///run/media/root/RHEL-8-0-0-BaseOS-x86_64/AppStream
+                    gpgcheck: no
+
+          - name: repository for BaseOS
+            yum_repository:
+                    name: BaseOS
+                    description: BaseOS Local Repo
+                    baseurl: file:///run/media/root/RHEL-8-0-0-BaseOS-x86_64/BaseOS
+                    gpgcheck: no

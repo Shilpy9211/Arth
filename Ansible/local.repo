@@ -1,0 +1,10 @@
+[1]
+name=baseos
+baseurl=file:///dvd/BaseOS
+gpgcheck=0
+
+
+[2]
+name=appstream
+baseurl=file:///dvd/AppStream
+gpgcheck=0

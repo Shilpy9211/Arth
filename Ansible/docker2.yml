@@ -1,0 +1,78 @@
+---
+
+- hosts: all
+  vars:
+          - LocalFile: /root/playbooks/webpages/index.html
+          - managedNodeFolder: /webpages
+          - server_exposedFolder: /usr/local/apache2/htdocs
+  tasks:
+#along wd docker repositry, we should hv yum configured for local software & should hv epel software
+          - name: docker repository
+            yum_repository:
+                    description: for installing docker-ce
+                    name: docker-ce
+                    baseurl: https://download.docker.com/linux/centos/7/x86_64/stable/
+                    gpgcheck: no
+
+          - name: docker installation
+            package:
+                    name: docker-ce-18.09.1-3.el7.x86_64
+                    state: present
+
+          - name: start docker service
+            service:
+                    name: docker
+                    state: started
+                    enabled: yes
+
+          - name: install python for using pip for installing docker sdk
+            package:
+                    name: python3
+                    state: present
+
+          - name: install docker sdk              #to use docker daemon,eg: docker ps, here we r using docker keyword, for using docker's api. 
+            pip:
+                    name: docker
+
+          - name: pull httpd server image
+            docker_image:
+                    name: httpd
+                    source: pull                   
+# create webpage manually in controller node, create folder in managed node and copy local webpage in created folder of managed node
+          - name: create folder in managed node
+            file:
+                    name: "{{ managedNodeFolder }}"
+                    state: directory
+
+          - name: copy file from controller node to managed node 
+            copy:
+                    src: "{{ LocalFile }}"
+                    dest: "{{ managedNodeFolder }}"
+
+          - name: run container, mounting the above webpage and expose it 
+            docker_container:
+                    name: httpdServer
+                    image: httpd
+                    state: started
+                    ports:
+                            - 8080:80
+                    volumes:
+                            - "{{ managedNodeFolder }}:/usr/local/apache2/htdocs/"
+
+          - name: firewall setup for accessing from outside
+            firewalld:
+                    port: "{{ item }}"
+                    permanent: yes
+                    state: enabled
+                    immediate: yes
+            with_items:
+                    - "8080/tcp"
+                    - "80/tcp"
+
+ 
+
+
+
+
+
+

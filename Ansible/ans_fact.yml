@@ -1,0 +1,8 @@
+- hosts: all
+  tasks:
+          - name: print fact
+            debug:
+                    var: ansible_facts['default_ipv4']['address']
+                    #var: ansible_facts['all_ipv4_addresses'][1]
+                    #var: ansible_facts
+
