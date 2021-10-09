@@ -9,5 +9,6 @@ Ansible folder contains some Ansible playbooks, for basic use cases.
 <b>yumConfig.yml</b>-----to configure yum with url of local packages for gui linux user.</Br>
 <b>docker2.yml</b>-----to launch docker and start webserver in container.</Br>
 <b>https.yml </b>-----to configure apache webserver with different configuration of port and document root.</Br>
+<b>http_auth.yml</b>-------for adding httpd authentication to challenging page of web server.</Br>
 <b>ansible.cfg & hosts </b>-----local configuration and inventory file for ansible.</Br>
-<b>local.repo and webpages</b>------other requirents, used in playbooks.</Br>
+<b>local.repo and webpages and .htaccess</b>------other requirents, used in playbooks.</Br>
