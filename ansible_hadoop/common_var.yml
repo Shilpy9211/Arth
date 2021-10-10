@@ -1,0 +1,6 @@
+NameNodeIP: 192.168.43.94
+jdk_path: /root/
+hadoop_path: /root/
+coreFilePath: /root/ansible_hadoop
+hdfsFilePath: /root/ansible_hadoop
+

@@ -1,0 +1,97 @@
+---
+
+- hosts: all
+  vars_files:
+          - common_var.yml
+  tasks:
+          - name: copy jdk software
+            copy:
+                    src: "{{ jdk_path }}/jdk-8u171-linux-x64.rpm" 
+                    dest: "{{ jdk_path }}"
+
+          - name: copy hadoop software
+            copy:
+                    src: "{{ hadoop_path }}/hadoop-1.2.1-1.x86_64.rpm"
+                    dest: "{{ hadoop_path }}"
+
+          - name: install jdk
+            command: "rpm -i {{ jdk_path }}/jdk-8u171-linux-x64.rpm"
+            ignore_errors: yes
+
+          - name: install hadoop
+            command: "rpm -i {{ hadoop_path }}/hadoop-1.2.1-1.x86_64.rpm --force"
+            changed_when: false
+
+          - name: configure core file
+            template:
+                    src: "{{ coreFilePath }}/core-site.xml"
+                    dest: /etc/hadoop/
+
+
+- hosts: namenode
+  vars:
+          node_name: name
+          dir: /nameNode
+          startStop:
+                  - "hadoop-daemon.sh stop namenode"
+                  - "hadoop-daemon.sh start namenode"
+          states:
+                  - absent
+                  - directory
+  vars_files:
+          - common_var.yml
+  tasks:
+          - name: create shared directory
+            file:
+                    path: "{{ dir }}"
+                    state: "{{ item }}"
+            loop: "{{ states }}"
+            notify:
+                    format namenode
+
+          - name: configure hdfs file
+            template:
+                    src: "{{ hdfsFilePath }}/hdfs-site.xml"
+                    dest: /etc/hadoop
+
+          - name: start namenode
+            command: "{{ item }}"
+            loop: "{{ startStop }}"
+
+  handlers:
+          - name: format namenode
+            command: "echo Y | hadoop namenode -format"
+
+
+- hosts: datanode
+  vars:
+          node_name: data
+          dir: /dataNode
+          startStop:
+                  - "hadoop-daemon.sh stop datanode"
+                  - "hadoop-daemon.sh start datanode"
+  vars_files:
+          - common_var.yml
+  tasks:
+          - name: create shared directory
+            file:
+                    path: "{{ dir }}"
+                    state: directory
+
+          - name: configure hdfs file
+            template:
+                    src: "{{ hdfsFilePath }}/hdfs-site.xml"
+                    dest: /etc/hadoop
+
+          - name: start datanode
+            command: "{{ item }}"
+            loop: "{{ startStop }}"
+
+          - name: storing cluster report
+            command: "hadoop dfsadmin -report"
+            register: report
+
+          - name: print cluster report
+            debug:
+                    var: report
+

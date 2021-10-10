@@ -1,0 +1,10 @@
+[namenode]
+#192.168.43.175 ansible_user=root ansible_ssh_pass=shilpy ansible_connection=local
+192.168.43.94 ansible_use=root ansible_ssh_pass=redhat
+[datanode]
+192.168.43.122 ansible_user=root ansible_ssh_pass=shilpy
+[tenant]
+192.168.43.242 ansible_user=root ansible_ssh_pass=redhat
+
+
+#ansible_connection=ssh is by default, no need to mention
